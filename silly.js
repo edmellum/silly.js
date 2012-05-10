@@ -2,50 +2,60 @@
 // (c) 2012 David Ed Mellum
 // Browserijade may be freely distributed under the MIT license.
 
+// Keep all our nasty local variables to ourselves.
 (function() {
-	var root = this;
 
-	var find = function(el) {
+	// Extend an object with a mixin object in a
+	// horrible naive way, yes I know this is bad.
+	var extend = function(target, mixin) {
+		for(var prop in mixin) {
+			target[prop] = mixin[prop];
+		}
+	}
+
+	// Base exported function.
+	// Finds elements using a CSS selector and returns
+	// a Silly object with all elements in it.
+	var find = function(els) {
 		var selector = null;
-		if('string' === typeof el) {
-			selector = el;
-			el = document.querySelectorAll(el);
+		if('string' === typeof els) {
+			selector = els;
+			els = document.querySelectorAll(els);
 		} else {
-			el = [el];
+			els = [els];
 		}
 
-		var sillyEls = {
+		var sillyEls = {}
+
+		extend(sillyEls, $.fn);
+
+		for(var i=0, len=els.length; i<len; i++) {
+			sillyEls[i] = els[i];
 		}
 
-		for(var prop in $.fn) {
-			sillyEls[prop] = $.fn[prop];
-		}
-
-		var i = 0;
-		forEach.call(el, function(el) {
-			sillyEls[i] = el;
-			i++;
-		});
-
-		sillyEls.length = el.length;
+		sillyEls.length = els.length;
 
 		return sillyEls;
 	}
 
+	// The dollar sign is my golden idol and I
+	// will never give it up.
 	var $;
-
+	// Export to a Node.js module or just make a
+	// global.
 	if('undefined' !== typeof exports) {
 		$ = module.exports = find;
 	} else {
-		$ = root.silly = {};
+		$ = this.silly = {};
 	}
 
-	var forEach = Array.prototype.forEach;
-
+	// This is where all the functions attached
+	// to Silly's element list objects are.
 	$.fn = {};
 
 	$.fn.find = find;
 
+	// Iterate over every element in a Silly object.
 	$.fn.each = function(iterator) {
 		var els = this;
 		for(var i=0; i < els.length; i++) {
@@ -53,13 +63,54 @@
 		}
 	}
 
+	// Add an event listener to all elements.
 	$.fn.bind = function(eventName, callback) {
-		var sillyEls = this;
-		sillyEls.each(function(el) {
+		this.each(function(el) {
 			el.addEventListener(eventName, callback, false);
 		});
 	}
 
+	// Get the style of the first element.
+	$.fn.css = function(prop) {
+		var el = this[0];
+		var style = getComputedStyle(el, null);
+		if(prop) {
+			return style[prop];
+		}
+		return style
+	}
+
+	// Show all elements.
+	$.fn.show = function() {
+		this.each(function(el) {
+			el.style.display = 'block';
+		});
+	}
+
+	// Hide all elements.
+	$.fn.hide = function() {
+		this.each(function(el) {
+			el.style.display = 'none';
+		});
+	}
+
+	// Toggle between hiding and showing the first element.
+	$.fn.toggle = function() {
+		var el = this;
+		if('none' === el.css('display')) {
+			el.show();
+		} else {
+			el.hide();
+		}
+	}
+
+	$.fn.submit = function() {
+		var el = this;
+		el.find('input');
+		input.forEach()
+	}
+
+	// Send an AJAX request.
 	var ajax = $.ajax = function(url, options, callback) {
 		var method = options.method.toUpperCase();
 
@@ -81,14 +132,18 @@
 		req.send(payload);
 	}
 
+	// Shortcut to send an AJAX GET request.
 	var get = $.get = function(url, callback) {
 		$.ajax(url, {method: 'get'}, callback);
 	}
 
+	// Shortcut to send an AJAX POST request.
 	var post = $.post = function(url, payload, callback) {
 		$.ajax(url, {method: 'post', payload: payload}, callback);
 	}
 
+	// Automatically parse JSON that's returned from
+	// from an AJAX request.
 	var ajaxHandler = function(event, callback) {
 		var data = event.target.responseText;
 		try {
@@ -97,40 +152,6 @@
 			console.log(e)
 		}
 		callback(data);
-	}
-
-	$.fn.css = function(prop) {
-		var el = this;
-		var style = getComputedStyle(el, null);
-		if(prop) {
-			return style[prop];
-		}
-		return style
-	}
-
-	$.fn.show = function() {
-		var el = this;
-		el.style.display = 'block';
-	}
-
-	$.fn.hide = function() {
-		var el = this;
-		el.style.display = 'none';
-	}
-
-	$.fn.toggle = function() {
-		var el = this;
-		if('none' === el.css('display')) {
-			el.show();
-		} else {
-			el.hide();
-		}
-	}
-
-	$.fn.submit = function() {
-		var el = this;
-		el.find('input');
-		input.forEach()
 	}
 
 }).call(this);
