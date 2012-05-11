@@ -1,0 +1,23 @@
+{
+  "author": "David Ed Mellum <david@edmellum.com> (edmellum.com)",
+  "name": "silly",
+  "description": "A silly DOM library built for the heck of it.",
+  "version": "0.2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/edmellum/silly.js"
+  },
+  "main": "./silly.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  },
+  "licenses": [
+    {
+      "type": "MIT +no-false-attribs",
+      "url": "http://github.com/isaacs/npm/raw/master/LICENSE"
+    }
+  ]
+}
